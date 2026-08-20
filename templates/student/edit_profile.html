@@ -1,0 +1,60 @@
+{% extends 'layout_dashboard.html' %}
+{% block title %}Edit Profile{% endblock %}
+{% block sidebar %}
+  <div class="sidebar-section">Overview</div>
+  <a href="{{ url_for('student_dashboard') }}" class="sidebar-link"><i class="bi bi-grid-fill"></i> Dashboard</a>
+  <div class="sidebar-section">Placement</div>
+  <a href="{{ url_for('student_drives') }}" class="sidebar-link"><i class="bi bi-briefcase"></i> Browse Drives</a>
+  <a href="{{ url_for('student_applications') }}" class="sidebar-link"><i class="bi bi-file-earmark-text"></i> My Applications</a>
+  <div class="sidebar-section">Account</div>
+  <a href="{{ url_for('student_edit_profile') }}" class="sidebar-link active"><i class="bi bi-person"></i> Edit Profile</a>
+{% endblock %}
+{% block content %}
+<div class="page-header"><h1>👤 Edit Profile</h1><p>Keep your profile updated to improve placement chances</p></div>
+<div style="display:grid;grid-template-columns:260px 1fr;gap:1.25rem;">
+  <!-- Profile summary -->
+  <div>
+    <div class="card" style="margin-bottom:1rem;">
+      <div class="card-body" style="text-align:center;padding:1.5rem;">
+        <div style="width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,var(--primary),#9B59B6);display:flex;align-items:center;justify-content:center;font-size:1.4rem;font-weight:700;color:#fff;margin:0 auto .75rem;">{{ student.full_name[0]|upper }}</div>
+        <div class="fw-700">{{ student.full_name }}</div>
+        <div style="font-size:.8rem;color:var(--muted);">{{ student.email }}</div>
+        {% if student.branch %}<div style="font-size:.8rem;color:var(--muted);margin-top:2px;">{{ student.branch }}</div>{% endif %}
+      </div>
+    </div>
+    {% if student.resume_path %}
+    <div class="card" style="border:2px solid var(--success);">
+      <div class="card-body" style="text-align:center;padding:1rem;">
+        <div style="font-size:1.8rem;">📄</div>
+        <div style="font-size:.82rem;font-weight:700;color:#1BB385;margin:.3rem 0;">Resume Uploaded ✓</div>
+        <a href="{{ url_for('download_resume', student_id=student.id) }}" class="btn btn-outline-secondary btn-sm">Download</a>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+  <!-- Edit form -->
+  <div class="card">
+    <div class="card-header">✏️ Edit Details</div>
+    <div class="card-body">
+      <form method="POST" action="{{ url_for('student_edit_profile') }}" enctype="multipart/form-data">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;">
+          <div class="mb-3"><label class="form-label">Full Name</label><input type="text" name="full_name" class="form-control" value="{{ student.full_name }}"></div>
+          <div class="mb-3"><label class="form-label">Phone</label><input type="text" name="phone" class="form-control" value="{{ student.phone or '' }}"></div>
+          <div class="mb-3"><label class="form-label">Branch</label><input type="text" name="branch" class="form-control" value="{{ student.branch or '' }}"></div>
+          <div class="mb-3"><label class="form-label">Year</label><input type="text" name="year" class="form-control" value="{{ student.year or '' }}" placeholder="3rd Year"></div>
+          <div class="mb-3"><label class="form-label">CGPA</label><input type="number" name="cgpa" class="form-control" value="{{ student.cgpa or '' }}" step="0.01" min="0" max="10" placeholder="8.5"></div>
+        </div>
+        <div class="mb-3"><label class="form-label">Skills <span style="font-weight:400;color:var(--muted);">(comma separated)</span></label><input type="text" name="skills" class="form-control" value="{{ student.skills or '' }}" placeholder="Python, Java, DSA..."></div>
+        <div class="mb-4">
+          <label class="form-label">📄 Upload Resume <span style="font-weight:400;color:var(--muted);">(PDF only, max 5MB)</span></label>
+          <div style="border:2px dashed rgba(108,99,255,0.25);border-radius:10px;padding:1rem;background:#F8F9FF;">
+            <input type="file" name="resume" class="form-control" accept=".pdf" style="border:none;background:transparent;padding:0;">
+            <div class="form-text">Replaces existing resume. PDF files only.</div>
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary w-100 btn-lg">💾 Save Profile</button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

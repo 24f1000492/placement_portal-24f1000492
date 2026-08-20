@@ -1,0 +1,76 @@
+{% extends 'layout_dashboard.html' %}
+
+{% block title %}{{ drive.job_title }}{% endblock %}
+
+{% block sidebar %}
+  <div class="sidebar-section">Overview</div>
+  <a href="{{ url_for('student_dashboard') }}" class="sidebar-link"><i class="bi bi-grid-fill"></i> Dashboard</a>
+  <div class="sidebar-section">Placement</div>
+  <a href="{{ url_for('student_drives') }}" class="sidebar-link active"><i class="bi bi-briefcase"></i> Browse Drives</a>
+  <a href="{{ url_for('student_applications') }}" class="sidebar-link"><i class="bi bi-file-earmark-text"></i> My Applications</a>
+  <div class="sidebar-section">Account</div>
+  <a href="{{ url_for('student_edit_profile') }}" class="sidebar-link"><i class="bi bi-person"></i> Edit Profile</a>
+{% endblock %}
+
+{% block content %}
+<a href="{{ url_for('student_drives') }}" class="btn btn-outline-secondary btn-sm" style="margin-bottom:1rem;"><i class="bi bi-arrow-left me-1"></i>Back to Drives</a>
+<div style="display:grid;grid-template-columns:1fr 300px;gap:1.25rem;">
+  <div>
+    <!-- Company Card -->
+    <div class="card" style="margin-bottom:1.25rem;">
+      <div class="card-header"><span>🏢 {{ drive.company.company_name }}</span></div>
+      <div class="card-body">
+        {% if drive.company.description %}<p style="color:var(--muted);font-size:.88rem;line-height:1.7;margin-bottom:.75rem;">{{ drive.company.description }}</p>{% endif %}
+        {% if drive.company.website %}<a href="{{ drive.company.website }}" target="_blank" class="btn btn-outline-secondary btn-sm"><i class="bi bi-globe me-1"></i>Visit Website</a>{% endif %}
+      </div>
+    </div>
+    <!-- Drive Card -->
+    <div class="card">
+      <div class="card-header">
+        <span>{{ drive.job_title }}</span>
+        <div style="display:flex;gap:.4rem;">
+          {% if drive.salary_package %}<span class="tag-pill">💰 {{ drive.salary_package }}</span>{% endif %}
+          {% if drive.location %}<span class="tag-pill">📍 {{ drive.location }}</span>{% endif %}
+        </div>
+      </div>
+      <div class="card-body">
+        <h6 style="font-weight:700;margin-bottom:.4rem;">Job Description</h6>
+        <p style="white-space:pre-line;font-size:.88rem;color:var(--muted);line-height:1.8;margin-bottom:1rem;">{{ drive.job_description }}</p>
+        {% if drive.eligibility_criteria %}
+        <h6 style="font-weight:700;margin-bottom:.4rem;">Eligibility Criteria</h6>
+        <p style="white-space:pre-line;font-size:.88rem;color:var(--muted);margin-bottom:1rem;">{{ drive.eligibility_criteria }}</p>
+        {% endif %}
+        <hr style="border-color:var(--border);margin:1rem 0;">
+        {% if existing_app %}
+        <div class="alert alert-{{ 'success' if existing_app.status == 'selected' else 'info' }}" style="display:flex;justify-content:space-between;align-items:center;margin:0;">
+          <span>✅ Already applied · Status: <strong>{{ existing_app.status|title }}</strong></span>
+          <a href="{{ url_for('student_applications') }}" class="btn btn-outline-secondary btn-sm">View History</a>
+        </div>
+        {% elif drive.application_deadline < today %}
+        <div class="alert alert-danger" style="margin:0;">⏰ The application deadline has passed.</div>
+        {% else %}
+        <form method="POST" action="{{ url_for('student_apply', drive_id=drive.id) }}">
+          <div style="display:flex;gap:.5rem;">
+            <button type="submit" class="btn btn-primary px-4">🚀 Apply Now</button>
+            <a href="{{ url_for('student_drives') }}" class="btn btn-outline-secondary px-4">Go Back</a>
+          </div>
+        </form>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  <!-- Sidebar Info -->
+  <div class="card" style="align-self:start;">
+    <div class="card-header">Drive Info</div>
+    <div class="card-body">
+      <div style="display:flex;flex-direction:column;gap:.6rem;font-size:.85rem;">
+        <div><span style="color:var(--muted);">Company</span><div class="fw-700" style="margin-top:2px;">{{ drive.company.company_name }}</div></div>
+        <div><span style="color:var(--muted);">Deadline</span><div class="fw-700" style="margin-top:2px;color:{% if drive.application_deadline < today %}var(--danger){% else %}#1BB385{% endif %};">{{ drive.application_deadline.strftime('%d %b %Y') }}</div></div>
+        {% if drive.salary_package %}<div><span style="color:var(--muted);">Package</span><div class="fw-700" style="color:#1BB385;margin-top:2px;">{{ drive.salary_package }}</div></div>{% endif %}
+        {% if drive.location %}<div><span style="color:var(--muted);">Location</span><div style="margin-top:2px;">{{ drive.location }}</div></div>{% endif %}
+        <div><span style="color:var(--muted);">Applications</span><div style="margin-top:2px;"><span class="badge badge-applied">{{ drive.applications|length }}</span></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

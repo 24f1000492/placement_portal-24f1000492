@@ -1,0 +1,176 @@
+{% extends 'layout_dashboard.html' %}
+
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block sidebar %}
+  <div class="sidebar-section">Overview</div>
+  <a href="{{ url_for('admin_dashboard') }}" class="sidebar-link active"><i class="bi bi-grid-fill"></i> Dashboard</a>
+  <div class="sidebar-section">Manage</div>
+  <a href="{{ url_for('admin_companies') }}" class="sidebar-link"><i class="bi bi-building"></i> Companies</a>
+  <a href="{{ url_for('admin_students') }}" class="sidebar-link"><i class="bi bi-people"></i> Students</a>
+  <a href="{{ url_for('admin_drives') }}" class="sidebar-link"><i class="bi bi-briefcase"></i> Drives</a>
+  <a href="{{ url_for('admin_applications') }}" class="sidebar-link"><i class="bi bi-file-earmark-text"></i> Applications</a>
+  <div class="sidebar-section">Tools</div>
+  <a href="{{ url_for('admin_search') }}" class="sidebar-link"><i class="bi bi-search"></i> Search</a>
+{% endblock %}
+
+{% block content %}
+<div class="page-header d-flex align-items-center justify-content-between">
+  <div><h1>Welcome, Admin 👋</h1><p>Complete placement system overview</p></div>
+  <a href="{{ url_for('admin_search') }}" class="btn btn-outline-primary btn-sm">
+    <i class="bi bi-search me-1"></i>Search
+  </a>
+</div>
+
+<!-- Stat Cards -->
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:1rem;margin-bottom:1.5rem;">
+  <div class="stat-card">
+    <div class="stat-icon indigo"><i class="bi bi-people-fill"></i></div>
+    <div><div class="stat-value">{{ stats.total_students }}</div><div class="stat-label">Total Students</div></div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon green"><i class="bi bi-building"></i></div>
+    <div><div class="stat-value">{{ stats.total_companies }}</div><div class="stat-label">Companies</div></div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon amber"><i class="bi bi-briefcase-fill"></i></div>
+    <div><div class="stat-value">{{ stats.total_drives }}</div><div class="stat-label">Drives</div></div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon red"><i class="bi bi-file-earmark-text-fill"></i></div>
+    <div><div class="stat-value">{{ stats.total_applications }}</div><div class="stat-label">Applications</div></div>
+  </div>
+</div>
+
+<!-- Pending alerts -->
+{% if stats.pending_companies > 0 or stats.pending_drives > 0 %}
+<div style="display:flex;gap:.75rem;flex-wrap:wrap;margin-bottom:1.25rem;">
+  {% if stats.pending_companies > 0 %}
+  <div class="alert alert-warning d-flex align-items-center justify-content-between" style="flex:1;min-width:240px;margin:0;">
+    <span>⏳ <strong>{{ stats.pending_companies }}</strong> company registration(s) pending approval</span>
+    <a href="{{ url_for('admin_companies') }}" class="btn btn-warning btn-sm ms-2">Review</a>
+  </div>
+  {% endif %}
+  {% if stats.pending_drives > 0 %}
+  <div class="alert alert-info d-flex align-items-center justify-content-between" style="flex:1;min-width:240px;margin:0;">
+    <span>📋 <strong>{{ stats.pending_drives }}</strong> drive(s) awaiting approval</span>
+    <a href="{{ url_for('admin_drives') }}" class="btn btn-primary btn-sm ms-2" style="color:#fff;">Review</a>
+  </div>
+  {% endif %}
+</div>
+{% endif %}
+
+<div style="display:flex;flex-direction:column;gap:1.25rem;">
+
+  <!-- Left: Lists -->
+  <div style="display:flex;flex-direction:column;gap:1.25rem;">
+
+    <!-- Recent Companies -->
+    <div class="card">
+      <div class="card-header">
+        <span><i class="bi bi-building me-2 text-muted"></i> Recent Companies</span>
+        <a href="{{ url_for('admin_companies') }}" class="btn btn-outline-secondary btn-sm">View All</a>
+      </div>
+      {% for c in recent_companies %}
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:.65rem 1rem;border-bottom:1px solid var(--border);">
+        <div>
+          <div class="fw-700" style="font-size:.88rem;">{{ c.company_name }}</div>
+          <div style="font-size:.75rem;color:var(--muted);">{{ c.email }}</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:.5rem;">
+          <span class="badge badge-{{ c.approval_status }}">{{ c.approval_status }}</span>
+          {% if c.approval_status == 'pending' %}
+          <a href="{{ url_for('admin_approve_company', company_id=c.id) }}" class="btn btn-success btn-sm">Approve</a>
+          {% endif %}
+        </div>
+      </div>
+      {% else %}
+      <div class="empty-state"><i class="bi bi-building"></i><p>No companies yet</p></div>
+      {% endfor %}
+    </div>
+
+    <!-- Recent Drives -->
+    <div class="card">
+      <div class="card-header">
+        <span><i class="bi bi-briefcase me-2 text-muted"></i> Recent Drives</span>
+        <a href="{{ url_for('admin_drives') }}" class="btn btn-outline-secondary btn-sm">View All</a>
+      </div>
+      {% for d in recent_drives %}
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:.65rem 1rem;border-bottom:1px solid var(--border);">
+        <div>
+          <div class="fw-700" style="font-size:.88rem;">{{ d.job_title }}</div>
+          <div style="font-size:.75rem;color:var(--muted);">{{ d.company.company_name }}</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:.5rem;">
+          <span class="badge badge-{{ d.status }}">{{ d.status }}</span>
+          {% if d.status == 'pending' %}
+          <a href="{{ url_for('admin_approve_drive', drive_id=d.id) }}" class="btn btn-success btn-sm">Approve</a>
+          {% endif %}
+        </div>
+      </div>
+      {% else %}
+      <div class="empty-state"><i class="bi bi-briefcase"></i><p>No drives yet</p></div>
+      {% endfor %}
+    </div>
+
+  </div>
+
+  <!-- Right: Charts + Recent Apps -->
+  <div style="display:flex;flex-direction:column;gap:1.25rem;">
+
+    <!-- Application Status Chart -->
+    <div class="card">
+      <div class="card-header"><span><i class="bi bi-bar-chart me-2 text-muted"></i> Application Status</span></div>
+      <div class="card-body">
+        {% if stats.total_applications > 0 %}
+        <div style="display:grid;grid-template-columns:1fr auto;gap:1rem;align-items:center;">
+          <div>
+            {% for label, key, cls in [('Applied','applied','applied'),('Shortlisted','shortlisted','shortlisted'),('Selected','selected','selected'),('Rejected','rejected','rejected')] %}
+            <div style="display:flex;justify-content:space-between;margin-bottom:3px;font-size:.83rem;">
+              <span style="font-weight:600;">{{ label }}</span>
+              <span style="color:var(--muted);">{{ app_counts[key] }}</span>
+            </div>
+            <div class="bar-track" style="margin-bottom:.65rem;">
+              <div class="bar-fill bar-{{ cls }}" style="width:{{ app_pcts[key] }}%"></div>
+            </div>
+            {% endfor %}
+          </div>
+          <div class="text-center">
+            {% set sel_pct = app_pcts['selected'] %}
+            <div class="donut" style="background:conic-gradient(#43D9A2 {{ sel_pct }}%,#eee {{ sel_pct }}%);">
+              <div class="donut-label"><div class="donut-pct">{{ sel_pct }}%</div><div class="donut-lbl">placed</div></div>
+            </div>
+          </div>
+        </div>
+        {% else %}
+        <div class="empty-state"><i class="bi bi-bar-chart"></i><p>No applications yet</p></div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Recent Applications -->
+    <div class="card">
+      <div class="card-header">
+        <span><i class="bi bi-clock-history me-2 text-muted"></i> Recent Applications</span>
+        <a href="{{ url_for('admin_applications') }}" class="btn btn-outline-secondary btn-sm">View All</a>
+      </div>
+      <table class="table">
+        <thead><tr><th>#</th><th>Student</th><th>Drive</th><th>Status</th></tr></thead>
+        <tbody>
+          {% for app in recent_apps %}
+          <tr>
+            <td style="color:var(--muted);">{{ loop.index }}</td>
+            <td><div class="fw-600" style="font-size:.85rem;">{{ app.student.full_name }}</div><div style="font-size:.75rem;color:var(--muted);">{{ app.student.branch or '' }}</div></td>
+            <td style="font-size:.83rem;">{{ app.drive.job_title }}</td>
+            <td><span class="badge badge-{{ app.status }}">{{ app.status }}</span></td>
+          </tr>
+          {% else %}
+          <tr><td colspan="4" style="text-align:center;padding:1.5rem;color:var(--muted);font-size:.85rem;">No applications yet</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

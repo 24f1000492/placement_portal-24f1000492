@@ -1,0 +1,129 @@
+{% extends 'base.html' %}
+
+{% block title %}Welcome{% endblock %}
+
+{% block body %}
+
+<div class="hero-modern">
+
+  <!-- NAVBAR -->
+  <div class="hero-nav">
+    <div class="hero-logo">Place<span>Portal</span></div>
+    <div class="badge" style="background:rgba(255,255,255,0.1);color:#fff;margin-bottom:1rem;text-transform:uppercase;font-size:.75rem;font-weight:700;">
+      ✨ Campus Recruitment Platform
+    </div>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="hero-content">
+
+    <div class="hero-title"> 
+      Start Your Placement <br>
+      <span>Journey Smartly</span>
+    </div>
+
+    <p class="hero-sub">
+      A unified portal for students to find jobs, companies to hire talent,
+      and placement cells to manage everything — seamlessly.
+    </p>
+
+    <!-- CARDS -->
+    <div class="hero-cards">
+
+      <a href="{{ url_for('auth_login', role='admin') }}" class="hero-card">
+        <div class="icon">🛡️</div>
+        <h3>Admin</h3>
+        <p>Manage placements</p>
+      </a>
+
+      <a href="{{ url_for('auth_login', role='company') }}" class="hero-card">
+        <div class="icon">🏢</div>
+        <h3>Company</h3>
+        <p>Hire talent</p>
+      </a>
+
+      <a href="{{ url_for('auth_login', role='student') }}" class="hero-card">
+        <div class="icon">🎓</div>
+        <h3>Student</h3>
+        <p>Apply for jobs</p>
+      </a>
+
+    </div>
+  </div>
+  <!-- FEATURES -->
+<div style="padding:3rem 1.5rem;background:transparent;">
+  <div style="max-width:1000px;margin:auto;text-align:center;">
+    <h2 style="font-family:Poppins;font-weight:700;margin-bottom:0.5rem;">
+      Why PlacePortal?
+    </h2>
+    <p style="color:var(--muted);margin-bottom:2rem;">
+      Everything you need to manage campus placements efficiently
+    </p>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1.5rem;">
+      
+      <div class="card">
+        <div class="card-body text-center">
+          <div style="font-size:2rem;">⚡</div>
+          <h4>Fast Process</h4>
+          <p class="text-muted">Quick application and approval workflows</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-body text-center">
+          <div style="font-size:2rem;">📊</div>
+          <h4>Analytics</h4>
+          <p class="text-muted">Track placements and performance easily</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-body text-center">
+          <div style="font-size:2rem;">🔒</div>
+          <h4>Secure</h4>
+          <p class="text-muted">Role-based access for safety and control</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-body text-center">
+          <div style="font-size:2rem;">🌐</div>
+          <h4>All-in-One</h4>
+          <p class="text-muted">Students, companies, and admins together</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+    <!-- STATS -->
+  <div style="background:rgba(255,255,255,0.1);color:#fff;margin-bottom:5rem;text-transform:uppercase;font-size:.75rem;font-weight:700;">
+    <div style="max-width:900px;margin:auto;">
+      <div class="hero-cards" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(2px,1fr));gap:5rem;text-align:center;">
+        
+        <div class="stat-card">
+          <div style="width:100%;">
+            <div class="stat-value">500+</div>
+            <div class="stat-label">Students</div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div style="width:100%;">
+            <div class="stat-value">100+</div>
+            <div class="stat-label">Companies</div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div style="width:100%;">
+            <div class="stat-value">300+</div>
+            <div class="stat-label">Placements</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

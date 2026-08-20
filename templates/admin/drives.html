@@ -1,0 +1,61 @@
+{% extends 'layout_dashboard.html' %}
+
+{% block title %}Drives{% endblock %}
+
+{% block sidebar %}
+  <div class="sidebar-section">Overview</div>
+  <a href="{{ url_for('admin_dashboard') }}" class="sidebar-link"><i class="bi bi-grid-fill"></i> Dashboard</a>
+  <div class="sidebar-section">Manage</div>
+  <a href="{{ url_for('admin_companies') }}" class="sidebar-link"><i class="bi bi-building"></i> Companies</a>
+  <a href="{{ url_for('admin_students') }}" class="sidebar-link"><i class="bi bi-people"></i> Students</a>
+  <a href="{{ url_for('admin_drives') }}" class="sidebar-link active"><i class="bi bi-briefcase"></i> Drives</a>
+  <a href="{{ url_for('admin_applications') }}" class="sidebar-link"><i class="bi bi-file-earmark-text"></i> Applications</a>
+  <div class="sidebar-section">Tools</div>
+  <a href="{{ url_for('admin_search') }}" class="sidebar-link"><i class="bi bi-search"></i> Search</a>
+{% endblock %}
+{% block content %}
+<div class="page-header d-flex align-items-center justify-content-between">
+  <div><h1>💼 Placement Drives</h1><p>Approve, reject and monitor drives</p></div>
+  <div style="display:flex;gap:.4rem;">
+    {% for s in ['','pending','approved','closed','rejected'] %}
+    <a href="{{ url_for('admin_drives', status=s) }}" class="btn btn-sm {% if status_filter == s %}btn-primary{% else %}btn-outline-secondary{% endif %}">{{ s|capitalize if s else 'All' }}</a>
+    {% endfor %}
+  </div>
+</div>
+{% if drives %}
+<div class="card">
+  <table class="table">
+    <thead><tr><th>#</th><th>Job Title</th><th>Company</th><th>Deadline</th><th>Applications</th><th>Status</th><th>Actions</th></tr></thead>
+    <tbody>
+      {% for d in drives %}
+      <tr>
+        <td style="color:var(--muted);">{{ loop.index }}</td>
+        <td>
+          <div class="fw-700" style="font-size:.88rem;">{{ d.job_title }}</div>
+          <div style="font-size:.75rem;color:var(--muted);">📍 {{ d.location or 'N/A' }} {% if d.salary_package %}· 💰 {{ d.salary_package }}{% endif %}</div>
+        </td>
+        <td style="font-size:.85rem;">{{ d.company.company_name }}</td>
+        <td style="font-size:.8rem;">
+          {{ d.application_deadline.strftime('%d %b %Y') }}<br>
+          <span style="color:{% if d.application_deadline < today %}var(--danger){% else %}#1BB385{% endif %};font-size:.72rem;font-weight:600;">{% if d.application_deadline < today %}Expired{% else %}Active{% endif %}</span>
+        </td>
+        <td><span class="badge badge-applied">{{ d.applications|length }}</span></td>
+        <td><span class="badge badge-{{ d.status }}">{{ d.status }}</span></td>
+        <td>
+          <div style="display:flex;gap:.3rem;flex-wrap:wrap;">
+            <a href="{{ url_for('admin_drive_detail', drive_id=d.id) }}" class="btn btn-outline-secondary btn-sm">View</a>
+            {% if d.status == 'pending' %}
+            <a href="{{ url_for('admin_approve_drive', drive_id=d.id) }}" class="btn btn-success btn-sm">Approve</a>
+            <a href="{{ url_for('admin_reject_drive', drive_id=d.id) }}" class="btn btn-danger btn-sm">Reject</a>
+            {% endif %}
+          </div>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<div class="card"><div class="empty-state p-4"><i class="bi bi-briefcase"></i><p>No drives found</p></div></div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+{% block title %}Register — {{ role|capitalize }}{% endblock %}
+{% block body %}
+<div class="auth-page" style="padding:2rem 1rem;">
+  <div class="auth-card" style="max-width:480px;">
+    <div class="auth-logo">Place<span>Portal</span></div>
+    <p class="auth-subtitle">
+      {% if role == 'company' %}<i class="bi bi-building-fill" style="color:var(--primary);"></i> Company Registration
+      {% else %}<i class="bi bi-mortarboard-fill" style="color:var(--primary);"></i> Student Registration{% endif %}
+    </p>
+
+    {% if role == 'company' %}
+    <div class="alert alert-warning" style="font-size:.82rem;">
+      ℹ️ After registering, admin must approve your company before you can login.
+    </div>
+    {% endif %}
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for category, message in messages %}
+        <div class="alert alert-{{ category }}">{{ message }}</div>
+      {% endfor %}
+    {% endwith %}
+
+    <form method="POST" action="{{ url_for('auth_register', role=role) }}">
+      <input type="hidden" name="role" value="{{ role }}">
+
+      {% if role == 'student' %}
+      <div class="mb-3">
+        <label class="form-label">Full Name *</label>
+        <input type="text" name="full_name" class="form-control" placeholder="Your full name" required>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Email *</label>
+        <input type="email" name="email" class="form-control" placeholder="your@email.com" required>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;">
+        <div class="mb-3">
+          <label class="form-label">Branch</label>
+          <input type="text" name="branch" class="form-control" placeholder="Computer Science">
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Year</label>
+          <input type="text" name="year" class="form-control" placeholder="3rd Year">
+        </div>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Phone</label>
+        <input type="text" name="phone" class="form-control" placeholder="9876543210">
+      </div>
+
+      {% else %}
+      <div class="mb-3">
+        <label class="form-label">Company Name *</label>
+        <input type="text" name="company_name" class="form-control" placeholder="TechCorp Pvt Ltd" required>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Login Email *</label>
+        <input type="email" name="email" class="form-control" placeholder="hr@company.com" required>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;">
+        <div class="mb-3">
+          <label class="form-label">HR Contact</label>
+          <input type="text" name="hr_contact" class="form-control" placeholder="HR Name">
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Phone</label>
+          <input type="text" name="phone" class="form-control" placeholder="Contact no.">
+        </div>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Website</label>
+        <input type="url" name="website" class="form-control" placeholder="https://company.com">
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Description</label>
+        <textarea name="description" class="form-control" rows="2" placeholder="Brief company description"></textarea>
+      </div>
+      {% endif %}
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;">
+        <div class="mb-4">
+          <label class="form-label">Password *</label>
+          <input type="password" name="password" class="form-control" placeholder="Min 6 chars" required>
+        </div>
+        <div class="mb-4">
+          <label class="form-label">Confirm Password *</label>
+          <input type="password" name="confirm_password" class="form-control" placeholder="Repeat" required>
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-primary w-100 btn-lg">
+        {% if role == 'company' %}Register Company{% else %}Register as Student{% endif %}
+      </button>
+    </form>
+
+    <div class="auth-divider">or</div>
+    <div style="text-align:center;font-size:.85rem;">
+      Already have an account?
+      <a href="{{ url_for('auth_login', role=role) }}" style="font-weight:700;">Login here</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

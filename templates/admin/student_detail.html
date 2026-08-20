@@ -1,0 +1,62 @@
+{% extends 'layout_dashboard.html' %}
+{% block title %}{{ student.full_name }}{% endblock %}
+{% block sidebar %}
+  <div class="sidebar-section">Overview</div>
+  <a href="{{ url_for('admin_dashboard') }}" class="sidebar-link"><i class="bi bi-grid-fill"></i> Dashboard</a>
+  <div class="sidebar-section">Manage</div>
+  <a href="{{ url_for('admin_companies') }}" class="sidebar-link"><i class="bi bi-building"></i> Companies</a>
+  <a href="{{ url_for('admin_students') }}" class="sidebar-link active"><i class="bi bi-people"></i> Students</a>
+  <a href="{{ url_for('admin_drives') }}" class="sidebar-link"><i class="bi bi-briefcase"></i> Drives</a>
+  <a href="{{ url_for('admin_applications') }}" class="sidebar-link"><i class="bi bi-file-earmark-text"></i> Applications</a>
+  <div class="sidebar-section">Tools</div>
+  <a href="{{ url_for('admin_search') }}" class="sidebar-link"><i class="bi bi-search"></i> Search</a>
+{% endblock %}
+{% block content %}
+<a href="{{ url_for('admin_students') }}" class="btn btn-outline-secondary btn-sm" style="margin-bottom:1rem;"><i class="bi bi-arrow-left me-1"></i>Back</a>
+<div style="display:grid;grid-template-columns:280px 1fr;gap:1.25rem;">
+  <div class="card" style="align-self:start;">
+    <div class="card-body" style="padding:1.5rem;text-align:center;">
+      <div style="width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,var(--primary),#9B59B6);display:flex;align-items:center;justify-content:center;font-size:1.5rem;font-weight:700;color:#fff;margin:0 auto 1rem;">{{ student.full_name[0]|upper }}</div>
+      <h5 class="fw-700">{{ student.full_name }}</h5>
+      <p style="color:var(--muted);font-size:.83rem;margin-bottom:.5rem;">{{ student.email }}</p>
+      {% if not student.is_active %}<span class="badge badge-rejected">Deactivated</span>{% endif %}
+      <hr style="border-color:var(--border);margin:.75rem 0;">
+      <div style="text-align:left;font-size:.84rem;">
+        {% if student.phone %}<div style="margin-bottom:.4rem;"><i class="bi bi-telephone text-muted me-2"></i>{{ student.phone }}</div>{% endif %}
+        {% if student.branch %}<div style="margin-bottom:.4rem;"><i class="bi bi-book text-muted me-2"></i>{{ student.branch }}</div>{% endif %}
+        {% if student.year %}<div style="margin-bottom:.4rem;"><i class="bi bi-calendar text-muted me-2"></i>{{ student.year }}</div>{% endif %}
+        {% if student.cgpa %}<div style="margin-bottom:.4rem;"><i class="bi bi-star text-muted me-2"></i>CGPA: {{ student.cgpa }}</div>{% endif %}
+      </div>
+      {% if student.skills %}<hr style="border-color:var(--border);margin:.75rem 0;"><div style="font-size:.8rem;text-align:left;color:var(--muted);">{{ student.skills }}</div>{% endif %}
+      {% if student.resume_path %}
+      <hr style="border-color:var(--border);margin:.75rem 0;">
+      <a href="{{ url_for('download_resume', student_id=student.id) }}" class="btn btn-primary w-100 btn-sm"><i class="bi bi-download me-1"></i>Download Resume</a>
+      {% endif %}
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-header">
+      <span>Applications ({{ applications|length }})</span>
+      <a href="{{ url_for('admin_edit_student', student_id=student.id) }}" class="btn btn-outline-primary btn-sm">Edit Student</a>
+    </div>
+    {% if applications %}
+    <table class="table">
+      <thead><tr><th>#</th><th>Drive</th><th>Company</th><th>Applied</th><th>Status</th></tr></thead>
+      <tbody>
+        {% for app in applications %}
+        <tr>
+          <td style="color:var(--muted);">{{ loop.index }}</td>
+          <td class="fw-600" style="font-size:.85rem;">{{ app.drive.job_title }}</td>
+          <td style="font-size:.83rem;color:var(--muted);">{{ app.drive.company.company_name }}</td>
+          <td style="font-size:.78rem;color:var(--muted);">{{ app.application_date.strftime('%d %b %Y') }}</td>
+          <td><span class="badge badge-{{ app.status }}">{{ app.status }}</span></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <div class="empty-state"><i class="bi bi-file-earmark-text"></i><p>No applications yet</p></div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,31 @@
+{% extends 'layout_dashboard.html' %}
+{% block title %}Edit Profile{% endblock %}
+{% block sidebar %}
+  <div class="sidebar-section">Overview</div>
+  <a href="{{ url_for('company_dashboard') }}" class="sidebar-link"><i class="bi bi-grid-fill"></i> Dashboard</a>
+  <div class="sidebar-section">Recruitment</div>
+  <a href="{{ url_for('company_drives') }}" class="sidebar-link"><i class="bi bi-briefcase"></i> My Drives</a>
+  <a href="{{ url_for('company_create_drive') }}" class="sidebar-link"><i class="bi bi-plus-circle"></i> Create Drive</a>
+  <div class="sidebar-section">Account</div>
+  <a href="{{ url_for('company_edit_profile') }}" class="sidebar-link active"><i class="bi bi-building-gear"></i> Edit Profile</a>
+{% endblock %}
+{% block content %}
+<div class="page-header"><h1>🏢 Edit Company Profile</h1></div>
+<div style="max-width:560px;">
+  <div class="card">
+    <div class="card-header">Company Information</div>
+    <div class="card-body">
+      <form method="POST" action="{{ url_for('company_edit_profile') }}">
+        <div class="mb-3"><label class="form-label">Company Name</label><input type="text" name="company_name" class="form-control" value="{{ company.company_name }}" required></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;">
+          <div class="mb-3"><label class="form-label">HR Contact</label><input type="text" name="hr_contact" class="form-control" value="{{ company.hr_contact or '' }}"></div>
+          <div class="mb-3"><label class="form-label">Phone</label><input type="text" name="phone" class="form-control" value="{{ company.phone or '' }}"></div>
+        </div>
+        <div class="mb-3"><label class="form-label">Website</label><input type="url" name="website" class="form-control" value="{{ company.website or '' }}"></div>
+        <div class="mb-4"><label class="form-label">Description</label><textarea name="description" class="form-control" rows="4">{{ company.description or '' }}</textarea></div>
+        <button type="submit" class="btn btn-primary w-100">Save Profile</button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

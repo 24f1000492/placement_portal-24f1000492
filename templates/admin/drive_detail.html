@@ -1,0 +1,86 @@
+{% extends 'layout_dashboard.html' %}
+{% block title %}Drive — {{ drive.job_title }}{% endblock %}
+{% block sidebar %}
+  <div class="sidebar-section">Overview</div>
+  <a href="{{ url_for('admin_dashboard') }}" class="sidebar-link"><i class="bi bi-grid-fill"></i> Dashboard</a>
+  <div class="sidebar-section">Manage</div>
+  <a href="{{ url_for('admin_companies') }}" class="sidebar-link"><i class="bi bi-building"></i> Companies</a>
+  <a href="{{ url_for('admin_students') }}" class="sidebar-link"><i class="bi bi-people"></i> Students</a>
+  <a href="{{ url_for('admin_drives') }}" class="sidebar-link active"><i class="bi bi-briefcase"></i> Drives</a>
+  <a href="{{ url_for('admin_applications') }}" class="sidebar-link"><i class="bi bi-file-earmark-text"></i> Applications</a>
+  <div class="sidebar-section">Tools</div>
+  <a href="{{ url_for('admin_search') }}" class="sidebar-link"><i class="bi bi-search"></i> Search</a>
+{% endblock %}
+{% block content %}
+<a href="{{ url_for('admin_drives') }}" class="btn btn-outline-secondary btn-sm" style="margin-bottom:1rem;"><i class="bi bi-arrow-left me-1"></i>Back to Drives</a>
+<div style="display:grid;grid-template-columns:1fr 320px;gap:1.25rem;">
+  <div>
+    <div class="card" style="margin-bottom:1.25rem;">
+      <div class="card-header">
+        <span>{{ drive.job_title }}</span>
+        <span class="badge badge-{{ drive.status }}">{{ drive.status }}</span>
+      </div>
+      <div class="card-body">
+        <div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1rem;">
+          <span class="tag-pill">Company 🏢 : {{ drive.company.company_name }}</span>
+          {% if drive.location %}<span class="tag-pill">Location 📍 : {{ drive.location }}</span>{% endif %}
+          {% if drive.salary_package %}<span class="tag-pill">Salary 💰 : {{ drive.salary_package }}</span>{% endif %}
+          <span class="tag-pill">📅 Deadline: {{ drive.application_deadline.strftime('%d %b %Y') }}</span>
+        </div>
+        <h6 style="font-weight:700;margin-bottom:.4rem;">Job Description</h6>
+        <p style="white-space:pre-line;font-size:.88rem;color:var(--muted);line-height:1.7;">{{ drive.job_description }}</p>
+        {% if drive.eligibility_criteria %}
+        <h6 style="font-weight:700;margin:.75rem 0 .4rem;">Eligibility</h6>
+        <p style="white-space:pre-line;font-size:.88rem;color:var(--muted);">{{ drive.eligibility_criteria }}</p>
+        {% endif %}
+        {% if drive.status == 'pending' %}
+        <div style="display:flex;gap:.5rem;margin-top:1rem;">
+          <a href="{{ url_for('admin_approve_drive', drive_id=drive.id) }}" class="btn btn-success">✓ Approve Drive</a>
+          <a href="{{ url_for('admin_reject_drive', drive_id=drive.id) }}" class="btn btn-danger">✗ Reject Drive</a>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><span>Applications ({{ applications|length }})</span></div>
+      {% if applications %}
+      <table class="table">
+        <thead><tr><th>#</th><th>Student</th><th>Applied</th><th>Status</th></tr></thead>
+        <tbody>
+          {% for app in applications %}
+          <tr>
+            <td style="color:var(--muted);">{{ loop.index }}</td>
+            <td><div class="fw-600" style="font-size:.85rem;">{{ app.student.full_name }}</div><div style="font-size:.75rem;color:var(--muted);">{{ app.student.branch or '' }}</div></td>
+            <td style="font-size:.78rem;color:var(--muted);">{{ app.application_date.strftime('%d %b %Y') }}</td>
+            <td><span class="badge badge-{{ app.status }}">{{ app.status }}</span></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <div class="empty-state"><i class="bi bi-file-earmark-text"></i><p>No applications yet</p></div>
+      {% endif %}
+    </div>
+  </div>
+  <div class="card" style="align-self:start;">
+    <div class="card-header">Drive Stats</div>
+    <div class="card-body">
+      {% set total = applications|length %}
+      {% set selected = applications|selectattr('status','equalto','selected')|list|length %}
+      {% set shortlisted = applications|selectattr('status','equalto','shortlisted')|list|length %}
+      <div style="text-align:center;margin-bottom:1rem;">
+        <div style="font-size:2.5rem;font-weight:800;font-family:Poppins,sans-serif;color:var(--primary);">{{ total }}</div>
+        <div style="color:var(--muted);font-size:.83rem;">Total Applications</div>
+      </div>
+      <div style="display:flex;justify-content:space-around;margin-bottom:.75rem;">
+        <div style="text-align:center;"><div style="font-weight:700;color:#B8860B;">{{ shortlisted }}</div><div style="font-size:.75rem;color:var(--muted);">Shortlisted</div></div>
+        <div style="text-align:center;"><div style="font-weight:700;color:#1BB385;">{{ selected }}</div><div style="font-size:.75rem;color:var(--muted);">Selected</div></div>
+      </div>
+      {% if total > 0 %}
+      <div class="bar-track"><div class="bar-fill bar-selected" style="width:{{ (selected/total*100)|int }}%"></div></div>
+      <div style="font-size:.75rem;color:var(--muted);margin-top:3px;">{{ (selected/total*100)|int }}% placement rate</div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

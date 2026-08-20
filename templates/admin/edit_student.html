@@ -1,0 +1,36 @@
+{% extends 'layout_dashboard.html' %}
+{% block title %}Edit {{ student.full_name }}{% endblock %}
+{% block sidebar %}
+  <div class="sidebar-section">Overview</div>
+  <a href="{{ url_for('admin_dashboard') }}" class="sidebar-link"><i class="bi bi-grid-fill"></i> Dashboard</a>
+  <div class="sidebar-section">Manage</div>
+  <a href="{{ url_for('admin_companies') }}" class="sidebar-link"><i class="bi bi-building"></i> Companies</a>
+  <a href="{{ url_for('admin_students') }}" class="sidebar-link active"><i class="bi bi-people"></i> Students</a>
+  <a href="{{ url_for('admin_drives') }}" class="sidebar-link"><i class="bi bi-briefcase"></i> Drives</a>
+  <a href="{{ url_for('admin_applications') }}" class="sidebar-link"><i class="bi bi-file-earmark-text"></i> Applications</a>
+  <div class="sidebar-section">Tools</div>
+  <a href="{{ url_for('admin_search') }}" class="sidebar-link"><i class="bi bi-search"></i> Search</a>
+{% endblock %}
+{% block content %}
+<a href="{{ url_for('admin_student_detail', student_id=student.id) }}" class="btn btn-outline-secondary btn-sm" style="margin-bottom:1rem;"><i class="bi bi-arrow-left me-1"></i>Back</a>
+<div style="max-width:520px;">
+  <div class="card">
+    <div class="card-header">✏️ Edit Student — {{ student.full_name }}</div>
+    <div class="card-body">
+      <form method="POST" action="{{ url_for('admin_edit_student', student_id=student.id) }}">
+        <div class="mb-3"><label class="form-label">Full Name</label><input type="text" name="full_name" class="form-control" value="{{ student.full_name }}" required></div>
+        <div class="mb-3"><label class="form-label">Email</label><input type="email" name="email" class="form-control" value="{{ student.email }}" required></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;">
+          <div class="mb-3"><label class="form-label">Phone</label><input type="text" name="phone" class="form-control" value="{{ student.phone or '' }}"></div>
+          <div class="mb-3"><label class="form-label">CGPA</label><input type="number" name="cgpa" class="form-control" value="{{ student.cgpa or '' }}" step="0.01" min="0" max="10"></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;">
+          <div class="mb-4"><label class="form-label">Branch</label><input type="text" name="branch" class="form-control" value="{{ student.branch or '' }}"></div>
+          <div class="mb-4"><label class="form-label">Year</label><input type="text" name="year" class="form-control" value="{{ student.year or '' }}"></div>
+        </div>
+        <button type="submit" class="btn btn-primary w-100">Save Changes</button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

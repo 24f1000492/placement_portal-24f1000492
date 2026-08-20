@@ -1,0 +1,68 @@
+{% extends 'layout_dashboard.html' %}
+{% block title %}{{ company.company_name }} Dashboard{% endblock %}
+{% block sidebar %}
+  <div class="sidebar-section">Overview</div>
+  <a href="{{ url_for('company_dashboard') }}" class="sidebar-link active"><i class="bi bi-grid-fill"></i> Dashboard</a>
+  <div class="sidebar-section">Recruitment</div>
+  <a href="{{ url_for('company_drives') }}" class="sidebar-link"><i class="bi bi-briefcase"></i> My Drives</a>
+  <a href="{{ url_for('company_create_drive') }}" class="sidebar-link"><i class="bi bi-plus-circle"></i> Create Drive</a>
+  <div class="sidebar-section">Account</div>
+  <a href="{{ url_for('company_edit_profile') }}" class="sidebar-link"><i class="bi bi-building-gear"></i> Edit Profile</a>
+{% endblock %}
+{% block content %}
+<div class="page-header d-flex align-items-center justify-content-between">
+  <div><h1>Welcome, {{ company.company_name }} 🏢</h1><p>Manage your placement drives and applicants</p></div>
+  <a href="{{ url_for('company_create_drive') }}" class="btn btn-primary"><i class="bi bi-plus-circle me-1"></i>Create Drive</a>
+</div>
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1rem;margin-bottom:1.5rem;">
+  <div class="stat-card"><div class="stat-icon indigo"><i class="bi bi-briefcase-fill"></i></div><div><div class="stat-value">{{ drive_data|length }}</div><div class="stat-label">Total Drives</div></div></div>
+  <div class="stat-card"><div class="stat-icon amber"><i class="bi bi-people-fill"></i></div><div><div class="stat-value">{{ drive_data|sum(attribute='applicant_count') }}</div><div class="stat-label">Total Applicants</div></div></div>
+  <div class="stat-card"><div class="stat-icon green"><i class="bi bi-check-circle-fill"></i></div><div><div class="stat-value">{{ drive_data|selectattr('drive.status','equalto','approved')|list|length }}</div><div class="stat-label">Active Drives</div></div></div>
+</div>
+
+<div class="card" style="margin-bottom:1.25rem;">
+  <div class="card-header">
+    <span><i class="bi bi-briefcase me-2 text-muted"></i>Upcoming Drives</span>
+    <a href="{{ url_for('company_create_drive') }}" class="btn btn-primary btn-sm"><i class="bi bi-plus me-1"></i>Create Drive</a>
+  </div>
+  <table class="table">
+    <thead><tr><th>#</th><th>Drive Name</th><th>Applicants</th><th>Deadline</th><th>Status</th><th>Actions</th></tr></thead>
+    <tbody>
+      {% for dd in drive_data if dd.drive.status in ('approved','pending') %}
+      <tr>
+        <td style="color:var(--muted);">{{ loop.index }}</td>
+        <td><div class="fw-700" style="font-size:.88rem;">{{ dd.drive.job_title }}</div><div style="font-size:.75rem;color:var(--muted);">{{ dd.drive.location or 'N/A' }}</div></td>
+        <td><span class="badge badge-applied">{{ dd.applicant_count }}</span></td>
+        <td style="font-size:.8rem;color:var(--muted);">{{ dd.drive.application_deadline.strftime('%d %b %Y') }}</td>
+        <td><span class="badge badge-{{ dd.drive.status }}">{{ dd.drive.status }}</span></td>
+        <td>
+          <a href="{{ url_for('company_drive_applications', drive_id=dd.drive.id) }}" class="btn btn-outline-secondary btn-sm">View Details</a>
+          <a href="{{ url_for('company_close_drive', drive_id=dd.drive.id) }}" class="btn btn-warning btn-sm ms-1">Mark Complete</a>
+        </td>
+      </tr>
+      {% else %}
+      <tr><td colspan="6" style="text-align:center;padding:1.5rem;color:var(--muted);font-size:.85rem;">No active drives. <a href="{{ url_for('company_create_drive') }}">Create one →</a></td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<div class="card">
+  <div class="card-header"><span><i class="bi bi-lock me-2 text-muted"></i>Closed Drives</span></div>
+  <table class="table">
+    <thead><tr><th>#</th><th>Drive Name</th><th>Applicants</th><th>Actions</th></tr></thead>
+    <tbody>
+      {% for dd in drive_data if dd.drive.status == 'closed' %}
+      <tr>
+        <td style="color:var(--muted);">{{ loop.index }}</td>
+        <td class="fw-600" style="font-size:.88rem;">{{ dd.drive.job_title }}</td>
+        <td><span class="badge badge-applied">{{ dd.applicant_count }}</span></td>
+        <td><a href="{{ url_for('company_drive_applications', drive_id=dd.drive.id) }}" class="btn btn-outline-secondary btn-sm">Update</a></td>
+      </tr>
+      {% else %}
+      <tr><td colspan="4" style="text-align:center;padding:1.5rem;color:var(--muted);font-size:.85rem;">No closed drives</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

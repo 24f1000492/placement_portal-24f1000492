@@ -1,0 +1,66 @@
+{% extends 'layout_dashboard.html' %}
+{% block title %}Applicants — {{ drive.job_title }}{% endblock %}
+{% block sidebar %}
+  <div class="sidebar-section">Overview</div>
+  <a href="{{ url_for('company_dashboard') }}" class="sidebar-link"><i class="bi bi-grid-fill"></i> Dashboard</a>
+  <div class="sidebar-section">Recruitment</div>
+  <a href="{{ url_for('company_drives') }}" class="sidebar-link active"><i class="bi bi-briefcase"></i> My Drives</a>
+  <a href="{{ url_for('company_create_drive') }}" class="sidebar-link"><i class="bi bi-plus-circle"></i> Create Drive</a>
+  <div class="sidebar-section">Account</div>
+  <a href="{{ url_for('company_edit_profile') }}" class="sidebar-link"><i class="bi bi-building-gear"></i> Edit Profile</a>
+{% endblock %}
+{% block content %}
+<div class="page-header d-flex align-items-start justify-content-between">
+  <div>
+    <a href="{{ url_for('company_drives') }}" class="btn btn-outline-secondary btn-sm" style="margin-bottom:.6rem;"><i class="bi bi-arrow-left me-1"></i>Back</a>
+    <h1>Update Applications for the Drive</h1>
+    <p>Job Title: {{ drive.job_title }} · {{ applications|length }} applicant(s)</p>
+  </div>
+  <div style="display:flex;gap:.3rem;">
+    {% for s in ['','applied','shortlisted','selected','rejected'] %}
+    <a href="{{ url_for('company_drive_applications', drive_id=drive.id, status=s) }}" class="btn btn-sm {% if status_filter == s %}btn-primary{% else %}btn-outline-secondary{% endif %}">{{ s|capitalize if s else 'All' }}</a>
+    {% endfor %}
+  </div>
+</div>
+
+{% if applications %}
+<div style="display:flex;flex-direction:column;gap:.75rem;">
+  {% for app in applications %}
+  <div class="card" style="border-left:4px solid {% if app.status=='selected' %}#43D9A2{% elif app.status=='shortlisted' %}#FFB830{% elif app.status=='rejected' %}#FF4757{% else %}#6C63FF{% endif %};">
+    <div class="card-body">
+      <div style="display:grid;grid-template-columns:auto 1fr auto auto;gap:1rem;align-items:start;">
+        <div style="font-size:2.5rem;">🎓</div>
+        <div>
+          <div style="font-weight:800;font-size:.95rem;font-family:Poppins,sans-serif;">Student Application</div>
+          <div style="margin-top:.3rem;font-size:.85rem;"><strong>Student Name:</strong> {{ app.student.full_name }}</div>
+          <div style="font-size:.85rem;"><strong>Department:</strong> {{ app.student.branch or 'N/A' }}</div>
+          <div style="font-size:.85rem;"><strong>Drive:</strong> {{ drive.job_title }}</div>
+          {% if app.student.cgpa %}<div style="font-size:.85rem;"><strong>CGPA:</strong> {{ app.student.cgpa }}</div>{% endif %}
+          <div style="margin-top:.4rem;font-size:.78rem;color:var(--muted);">Applied: {{ app.application_date.strftime('%d %b %Y') }}</div>
+        </div>
+        <div style="text-align:center;">
+          <span class="badge badge-{{ app.status }}" style="font-size:.82rem;padding:5px 12px;">{{ app.status|title }}</span>
+          {% if app.student.resume_path %}
+          <div style="margin-top:.5rem;"><a href="{{ url_for('download_resume', student_id=app.student.id) }}" class="btn btn-outline-secondary btn-sm">View Resume</a></div>
+          {% endif %}
+        </div>
+        <div style="min-width:130px;">
+          <form method="POST" action="{{ url_for('company_update_application', app_id=app.id) }}">
+            <select name="status" class="form-select" style="font-size:.83rem;margin-bottom:.4rem;">
+              <option value="applied"     {% if app.status=='applied'     %}selected{% endif %}>Applied</option>
+              <option value="shortlisted" {% if app.status=='shortlisted' %}selected{% endif %}>Shortlist</option>
+              <option value="selected"    {% if app.status=='selected'    %}selected{% endif %}>Select</option>
+              <option value="rejected"    {% if app.status=='rejected'    %}selected{% endif %}>Reject</option>
+            </select>
+            <button type="submit" class="btn btn-primary w-100 btn-sm">Save</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<div class="card"><div class="empty-state p-5"><i class="bi bi-people"></i><p>No applications{% if status_filter %} with status "{{ status_filter }}"{% endif %}.</p></div></div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,51 @@
+{% extends 'layout_dashboard.html' %}
+
+{% block title %}Browse Drives{% endblock %}
+
+{% block sidebar %}
+  <div class="sidebar-section">Overview</div>
+  <a href="{{ url_for('student_dashboard') }}" class="sidebar-link"><i class="bi bi-grid-fill"></i> Dashboard</a>
+  <div class="sidebar-section">Placement</div>
+  <a href="{{ url_for('student_drives') }}" class="sidebar-link active"><i class="bi bi-briefcase"></i> Browse Drives</a>
+  <a href="{{ url_for('student_applications') }}" class="sidebar-link"><i class="bi bi-file-earmark-text"></i> My Applications</a>
+  <div class="sidebar-section">Account</div>
+  <a href="{{ url_for('student_edit_profile') }}" class="sidebar-link"><i class="bi bi-person"></i> Edit Profile</a>
+{% endblock %}
+
+{% block content %}
+<div class="page-header d-flex align-items-center justify-content-between">
+  <div><h1>💼 Browse Drives</h1><p>All open placement drives</p></div>
+</div>
+<div class="card" style="margin-bottom:1rem;"><div class="card-body" style="padding:.75rem 1rem;">
+  <form method="GET" style="display:flex;gap:.5rem;">
+    <input type="text" name="search" value="{{ search }}" class="form-control" placeholder="Search by job title or company...">
+    <button class="btn btn-primary" style="white-space:nowrap;"><i class="bi bi-search me-1"></i>Search</button>
+    {% if search %}<a href="{{ url_for('student_drives') }}" class="btn btn-outline-secondary" style="white-space:nowrap;">Clear</a>{% endif %}
+  </form>
+</div></div>
+{% if drives %}
+<div class="card">
+  {% for d in drives %}
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:1rem;border-bottom:1px solid var(--border);">
+    <div>
+      <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.5px;">
+        <div class="fw-700" style="font-size:.95rem;">{{ d.job_title }}</div>
+        {% if d.id in applied_drive_ids %}<span class="badge badge-selected">✓ Applied</span>{% endif %}
+      </div>
+      <div style="font-size:.8rem;color:var(--primary);font-weight:700;margin-bottom:3px;">🏢 {{ d.company.company_name }}</div>
+      <div>
+        {% if d.salary_package %}<span class="tag-pill">💰 {{ d.salary_package }}</span>{% endif %}
+        {% if d.location %}<span class="tag-pill">📍 {{ d.location }}</span>{% endif %}
+        <span class="tag-pill" style="color:{% if d.application_deadline < today %}var(--danger){% else %}#1BB385{% endif %};font-weight:600;">
+          ⏰ {{ d.application_deadline.strftime('%d %b %Y') }}
+        </span>
+      </div>
+    </div>
+    <a href="{{ url_for('student_drive_detail', drive_id=d.id) }}" class="btn btn-outline-primary btn-sm" style="white-space:nowrap;">View Details</a>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<div class="card"><div class="empty-state p-5"><i class="bi bi-briefcase"></i><p>No open drives right now. Check back soon!</p></div></div>
+{% endif %}
+{% endblock %}

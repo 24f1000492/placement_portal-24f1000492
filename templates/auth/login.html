@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% block title %}Login — {{ role|capitalize }} Portal{% endblock %}
+{% block body %}
+<div class="auth-page">
+  <div class="auth-card">
+    <div class="auth-logo">Place<span>Portal</span></div>
+
+    {% if role == 'admin' %}
+      <p class="auth-subtitle"> Admin / Placement Cell Login</p>
+    {% elif role == 'company' %}
+      <p class="auth-subtitle"> Company Login</p>
+    {% else %}
+      <p class="auth-subtitle"> Student Login</p>
+    {% endif %}
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for category, message in messages %}
+        <div class="alert alert-{{ category }}">{{ message }}</div>
+      {% endfor %}
+    {% endwith %}
+
+    <form method="POST" action="{{ url_for('auth_login', role=role) }}">
+      <input type="hidden" name="role" value="{{ role }}">
+      <div class="mb-3">
+        <label class="form-label">Email Address</label>
+        <input type="email" name="email" class="form-control" placeholder="Enter your email" required>
+      </div>
+      <div class="mb-4">
+        <label class="form-label">Password</label>
+        <input type="password" name="password" class="form-control" placeholder="Enter your password" required>
+      </div>
+      <button type="submit" class="btn btn-primary w-100 btn-lg">
+        {% if role == 'admin' %}Login as Admin
+        {% elif role == 'company' %}Login as Company
+        {% else %}Login as Student{% endif %}
+      </button>
+    </form>
+
+    {% if role != 'admin' %}
+    <div class="auth-divider">or</div>
+    <div style="text-align:center;font-size:.85rem;">
+      Don't have an account?
+      <a href="{{ url_for('auth_register', role=role) }}" style="font-weight:700;">Register here</a>
+    </div>
+    {% endif %}
+
+    <div style="text-align:center;margin-top:1rem;">
+      <a href="{{ url_for('home') }}" style="color:var(--muted);font-size:.82rem;">
+        <i class="bi bi-arrow-left"></i> Back to Home
+      </a>
+    </div>
+  </div>
+</div>
+{% endblock %}

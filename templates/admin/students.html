@@ -1,0 +1,58 @@
+{% extends 'layout_dashboard.html' %}
+{% block title %}Students{% endblock %}
+{% block sidebar %}
+  <div class="sidebar-section">Overview</div>
+  <a href="{{ url_for('admin_dashboard') }}" class="sidebar-link"><i class="bi bi-grid-fill"></i> Dashboard</a>
+  <div class="sidebar-section">Manage</div>
+  <a href="{{ url_for('admin_companies') }}" class="sidebar-link"><i class="bi bi-building"></i> Companies</a>
+  <a href="{{ url_for('admin_students') }}" class="sidebar-link active"><i class="bi bi-people"></i> Students</a>
+  <a href="{{ url_for('admin_drives') }}" class="sidebar-link"><i class="bi bi-briefcase"></i> Drives</a>
+  <a href="{{ url_for('admin_applications') }}" class="sidebar-link"><i class="bi bi-file-earmark-text"></i> Applications</a>
+  <div class="sidebar-section">Tools</div>
+  <a href="{{ url_for('admin_search') }}" class="sidebar-link"><i class="bi bi-search"></i> Search</a>
+{% endblock %}
+{% block content %}
+<div class="page-header"><h1>🎓 Students</h1><p>Manage student accounts</p></div>
+<div class="card" style="margin-bottom:1rem;">
+  <div class="card-body" style="padding:.75rem 1rem;">
+    <form method="GET" style="display:flex;gap:.5rem;">
+      <input type="text" name="search" value="{{ search }}" class="form-control" placeholder="Search by name, email, phone...">
+      <button class="btn btn-primary" style="white-space:nowrap;"><i class="bi bi-search me-1"></i>Search</button>
+      {% if search %}<a href="{{ url_for('admin_students') }}" class="btn btn-outline-secondary" style="white-space:nowrap;">Clear</a>{% endif %}
+    </form>
+  </div>
+</div>
+{% if students %}
+<div class="card">
+  <table class="table">
+    <thead><tr><th>#</th><th>Student</th><th>Branch / Year</th><th>CGPA</th><th>Applications</th><th>Status</th><th>Actions</th></tr></thead>
+    <tbody>
+      {% for s in students %}
+      <tr>
+        <td style="color:var(--muted);">{{ loop.index }}</td>
+        <td>
+          <div class="fw-700" style="font-size:.88rem;">{{ s.full_name }}</div>
+          <div style="font-size:.75rem;color:var(--muted);">{{ s.email }}</div>
+          {% if s.phone %}<div style="font-size:.72rem;color:var(--muted);">{{ s.phone }}</div>{% endif %}
+        </td>
+        <td style="font-size:.85rem;">{{ s.branch or '—' }}<br><span style="color:var(--muted);font-size:.75rem;">{{ s.year or '' }}</span></td>
+        <td>{% if s.cgpa %}<span class="badge {% if s.cgpa>=8 %}badge-selected{% elif s.cgpa>=6 %}badge-shortlisted{% else %}badge-rejected{% endif %}">{{ s.cgpa }}</span>{% else %}—{% endif %}</td>
+        <td><span class="badge badge-applied">{{ s.applications|length }}</span></td>
+        <td>{% if s.is_active %}<span class="badge badge-selected">Active</span>{% else %}<span class="badge badge-rejected">Inactive</span>{% endif %}</td>
+        <td>
+          <div style="display:flex;gap:.3rem;flex-wrap:wrap;">
+            <a href="{{ url_for('admin_student_detail', student_id=s.id) }}" class="btn btn-outline-secondary btn-sm">View</a>
+            <a href="{{ url_for('admin_edit_student', student_id=s.id) }}" class="btn btn-outline-primary btn-sm">Edit</a>
+            <a href="{{ url_for('admin_toggle_student', student_id=s.id) }}" class="btn {% if s.is_active %}btn-warning{% else %}btn-success{% endif %} btn-sm">{% if s.is_active %}Deactivate{% else %}Activate{% endif %}</a>
+            <a href="{{ url_for('admin_delete_student', student_id=s.id) }}" class="btn btn-outline-danger btn-sm" onclick="return confirm('Delete?')"><i class="bi bi-trash"></i></a>
+          </div>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<div class="card"><div class="empty-state p-4"><i class="bi bi-people"></i><p>No students found</p></div></div>
+{% endif %}
+{% endblock %}

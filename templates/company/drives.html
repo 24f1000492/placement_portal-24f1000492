@@ -1,0 +1,51 @@
+{% extends 'layout_dashboard.html' %}
+{% block title %}My Drives{% endblock %}
+{% block sidebar %}
+  <div class="sidebar-section">Overview</div>
+  <a href="{{ url_for('company_dashboard') }}" class="sidebar-link"><i class="bi bi-grid-fill"></i> Dashboard</a>
+  <div class="sidebar-section">Recruitment</div>
+  <a href="{{ url_for('company_drives') }}" class="sidebar-link active"><i class="bi bi-briefcase"></i> My Drives</a>
+  <a href="{{ url_for('company_create_drive') }}" class="sidebar-link"><i class="bi bi-plus-circle"></i> Create Drive</a>
+  <div class="sidebar-section">Account</div>
+  <a href="{{ url_for('company_edit_profile') }}" class="sidebar-link"><i class="bi bi-building-gear"></i> Edit Profile</a>
+{% endblock %}
+{% block content %}
+<div class="page-header d-flex align-items-center justify-content-between">
+  <div><h1>💼 My Drives</h1><p>All drives for {{ company.company_name }}</p></div>
+  <a href="{{ url_for('company_create_drive') }}" class="btn btn-primary"><i class="bi bi-plus-circle me-1"></i>New Drive</a>
+</div>
+{% if drives %}
+<div class="card">
+  <table class="table">
+    <thead><tr><th>#</th><th>Job Title</th><th>Deadline</th><th>Applicants</th><th>Status</th><th>Actions</th></tr></thead>
+    <tbody>
+      {% for d in drives %}
+      <tr>
+        <td style="color:var(--muted);">{{ loop.index }}</td>
+        <td>
+          <div class="fw-700" style="font-size:.88rem;">{{ d.job_title }}</div>
+          <div style="font-size:.75rem;color:var(--muted);">{% if d.salary_package %}💰 {{ d.salary_package }}{% endif %} {% if d.location %}📍 {{ d.location }}{% endif %}</div>
+        </td>
+        <td style="font-size:.8rem;">
+          {{ d.application_deadline.strftime('%d %b %Y') }}<br>
+          <span style="color:{% if d.application_deadline < today %}var(--danger){% else %}#1BB385{% endif %};font-size:.72rem;font-weight:600;">{% if d.application_deadline < today %}Expired{% else %}Active{% endif %}</span>
+        </td>
+        <td><a href="{{ url_for('company_drive_applications', drive_id=d.id) }}" class="badge badge-applied" style="text-decoration:none;">{{ d.applications|length }}</a></td>
+        <td><span class="badge badge-{{ d.status }}">{{ d.status }}</span></td>
+        <td>
+          <div style="display:flex;gap:.3rem;flex-wrap:wrap;">
+            <a href="{{ url_for('company_drive_applications', drive_id=d.id) }}" class="btn btn-outline-secondary btn-sm">Applicants</a>
+            <a href="{{ url_for('company_edit_drive', drive_id=d.id) }}" class="btn btn-outline-primary btn-sm">Edit</a>
+            {% if d.status != 'closed' %}<a href="{{ url_for('company_close_drive', drive_id=d.id) }}" class="btn btn-warning btn-sm">Close</a>{% endif %}
+            <a href="{{ url_for('company_delete_drive', drive_id=d.id) }}" class="btn btn-outline-danger btn-sm" onclick="return confirm('Delete?')"><i class="bi bi-trash"></i></a>
+          </div>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<div class="card"><div class="empty-state p-4"><i class="bi bi-briefcase"></i><p>No drives yet. <a href="{{ url_for('company_create_drive') }}">Create your first drive →</a></p></div></div>
+{% endif %}
+{% endblock %}

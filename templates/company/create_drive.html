@@ -1,0 +1,34 @@
+{% extends 'layout_dashboard.html' %}
+{% block title %}Create Drive{% endblock %}
+{% block sidebar %}
+  <div class="sidebar-section">Overview</div>
+  <a href="{{ url_for('company_dashboard') }}" class="sidebar-link"><i class="bi bi-grid-fill"></i> Dashboard</a>
+  <div class="sidebar-section">Recruitment</div>
+  <a href="{{ url_for('company_drives') }}" class="sidebar-link"><i class="bi bi-briefcase"></i> My Drives</a>
+  <a href="{{ url_for('company_create_drive') }}" class="sidebar-link active"><i class="bi bi-plus-circle"></i> Create Drive</a>
+  <div class="sidebar-section">Account</div>
+  <a href="{{ url_for('company_edit_profile') }}" class="sidebar-link"><i class="bi bi-building-gear"></i> Edit Profile</a>
+{% endblock %}
+{% block content %}
+<div class="page-header"><h1>➕ Create a Drive</h1><p>Submit for admin approval before going live</p></div>
+<div style="max-width:640px;">
+  <div class="card">
+    <div class="card-body">
+      <form method="POST" action="{{ url_for('company_create_drive') }}">
+        <div class="mb-3"><label class="form-label">Drive Name / Job Title *</label><input type="text" name="job_title" class="form-control" placeholder="e.g. Software Engineer" required></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;">
+          <div class="mb-3"><label class="form-label">Salary / Package</label><input type="text" name="salary_package" class="form-control" placeholder="e.g. 8 LPA"></div>
+          <div class="mb-3"><label class="form-label">Location</label><input type="text" name="location" class="form-control" placeholder="e.g. Bangalore, Remote"></div>
+        </div>
+        <div class="mb-3"><label class="form-label">Application Deadline *</label><input type="date" name="application_deadline" class="form-control" required></div>
+        <div class="mb-3"><label class="form-label">Job Description *</label><textarea name="job_description" class="form-control" rows="5" placeholder="Detailed job description, responsibilities..." required></textarea></div>
+        <div class="mb-4"><label class="form-label">Eligibility Criteria</label><textarea name="eligibility_criteria" class="form-control" rows="3" placeholder="e.g. CGPA >= 7.0, CSE/IT branch, 2025 batch..."></textarea></div>
+        <div style="display:flex;gap:.5rem;">
+          <button type="submit" class="btn btn-primary px-4">💾 Save</button>
+          <a href="{{ url_for('company_drives') }}" class="btn btn-outline-secondary px-4">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
